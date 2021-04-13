@@ -1,0 +1,7 @@
+namespace: app-tenant-team-a
+
+resources:
+- ../base
+
+patches:
+- rolebinding.yaml
