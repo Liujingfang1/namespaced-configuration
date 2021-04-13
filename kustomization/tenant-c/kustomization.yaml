@@ -1,4 +1,4 @@
-namespace: app-tenant-team-b
+namespace: tenant-c
 
 resources:
 - ../base
