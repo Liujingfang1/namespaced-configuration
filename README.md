@@ -83,9 +83,40 @@ $ git commit -m 'update configuration'
 $ git push origin main
 ```
 
-### Sync namespace specific policies
+## Sync namespace specific policies
 
-Assume there is a RootSync custom resource in your cluster. It syncs to your root Git repository for the current cluster <ROOT_REPO>. To sync the namespace specific policies, you need to declare both the namespaces and policies for those namespaces. This can be done with the following steps.
+### No existing RootSync
+If there is no existing RootSync custom resource in your cluster, you can create one with the following configuration.
+
+```yaml
+# root-sync.yaml
+apiVersion: configsync.gke.io/v1beta1
+kind: RootSync
+metadata:
+  name: root-sync
+  namespace: config-management-system
+spec:
+  sourceFormat: unstructured
+  git:
+    repo: https://github.com/<YOUR_ORGANIZATION>/namespaced-configuration.git
+    branch: main
+    dir: "namespaces"
+    # We recommend securing your source repository.
+    # Other supported auth: `ssh`, `cookiefile`, `token`, `gcenode`.
+    auth: none
+    # Refer to a Secret you create to hold the private key, cookiefile, or token.
+    # secretRef:
+    #   name: SECRET_NAME
+```
+
+Then apply it to the cluster
+
+```shell script
+$ kubectl apply -f root-sync.yaml
+```
+
+### With existing RootSync
+If there is an existing RootSync custom resource in your cluster. It syncs to your root Git repository for the current cluster <ROOT_REPO>. To sync the namespace specific policies, you need to declare both the namespaces and policies for those namespaces. This can be done with the following steps.
 
 Clone the root repository to your local machine.
 ```
