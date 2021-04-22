@@ -80,6 +80,10 @@ $ git commit -m 'update configuration'
 $ git push origin main
 ```
 
+Note that in this example, the kustomize output is written into a different
+directory on the same branch in the same Git repository. You can also write
+the kustomize output into a different Git repository if desired.
+
 ## Sync namespace specific policies
 
 Now you can configure ConfigSync to sync these policies to the cluster.
