@@ -9,10 +9,10 @@ In this tutorial, you will
 
 ## Before you begin
 This section describes prerequisites you must meet before this tutorial.
-- ConfigSync is installed on your cluster, with the version at least 1.7.0. If not, you can install it following the installation instructions.
-- Configure ConfigSync so that it can sync from a repository. If not, you can configure it following the steps to enable it.
+- ConfigSync is installed on your cluster, with the version at least 1.7.0. If not, you can install
+  it following the [instructions](https://cloud.google.com/anthos-config-management/docs/how-to/installing-config-sync).
 - `git` is installed in your local machine.
-- `kustomize` is installed in your local machine. If not, you can install the binary following the installation instructions.
+- `kustomize` is installed in your local machine. If not, you can install it by `gcloud components install kustomize`.
 
 ## Create namespace specific policies
 
@@ -82,59 +82,19 @@ $ git push origin main
 
 ## Sync namespace specific policies
 
-### No existing RootSync
-If there is no existing RootSync custom resource in your cluster, you can create one with the following configuration.
+Now you can configure ConfigSync to sync these policies to the cluster.
 
-```yaml
-# root-sync.yaml
-apiVersion: configsync.gke.io/v1beta1
-kind: RootSync
-metadata:
-  name: root-sync
-  namespace: config-management-system
-spec:
-  sourceFormat: unstructured
-  git:
-    repo: https://github.com/<YOUR_ORGANIZATION>/namespaced-configuration.git
-    branch: main
-    dir: "deploy"
-    # We recommend securing your source repository.
-    # Other supported auth: `ssh`, `cookiefile`, `token`, `gcenode`.
-    auth: none
-    # Refer to a Secret you create to hold the private key, cookiefile, or token.
-    # secretRef:
-    #   name: SECRET_NAME
-```
+Following the console instructions for
+[configuring Config Sync](https://cloud.google.com/anthos-config-management/docs/how-to/installing-config-sync),
+you need to
 
-Then apply it to the cluster
+- Select *None* in the *Git Repository Authentication for ACM* section
+- Select *Enable Config Sync* in the *ACM settings for your clusters* section
+   - the *URL* should be the Git repository url for your fork: `https://github.com/<YOUR_ORGANIZATION>/namespaced-configuration.git`.
+   - the *Branch" should be `main`.
+   - the *Tag/Commit* should be `HEAD`.
+   - the `Source format` field should *unstructured*.
 
-```shell script
-$ kubectl apply -f root-sync.yaml
-```
-
-### With existing RootSync
-If there is an existing RootSync custom resource in your cluster. It syncs to your root Git repository for the current cluster <ROOT_REPO>. To sync the namespace specific policies, you need to declare both the namespaces and policies for those namespaces. This can be done with the following steps.
-
-Clone the root repository to your local machine.
-```
-$ git clone <ROOT_REPO> root_repo
-```
-
-Copy the namespace specific policies into the root repository
-
-```
-$ cp configuration/deploy/tenant-a/manifest.yaml  root_repo/deploy/tenanat-a/manifest.yaml
-$ cp configuration/deploy/tenant-b/manifest.yaml  root_repo/deploy/tenanat-b/manifest.yaml
-$ cp configuration/deploy/tenant-c/manifest.yaml  root_repo/deploy/tenanat-c/manifest.yaml
-```
-
-Commit and push the changes to the remote root repository.
-
-```
-$ git add .
-$ git commit -m 'add namespaces and policies'
-$ git push origin main
-```
 
 ## Verify namespace specific policies are synced
 Now you can verify that the namespace specific policies are synced to the cluster.
@@ -158,10 +118,10 @@ $ kubectl get NetworkPolicy/deny-all -n tenant-a
 
 
 ## Cleanup
-To clean up the tenant namespaces and policies for them, we recommend removing the directories that contain their configuration from the root repository.
+To clean up the tenant namespaces and policies for them, we recommend removing the directories that contain their configuration from your Git repository.
 
 ```
-$ rm -r root_repo/deploy/tenant-a configuration/deploy/tenant-b configuration/deploy/tenant-c
+$ rm -r configuration/deploy/tenant-a configuration/deploy/tenant-b configuration/deploy/tenant-c
 $ git add .
 $ git commit -m 'clean up'
 $ git push
