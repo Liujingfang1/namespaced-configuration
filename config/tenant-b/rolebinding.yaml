@@ -1,8 +1,0 @@
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: tenant-admin-rolebinding
-subjects:
-- kind: Group
-  name: tenant-b-admin@mydomain.com
-  apiGroup: rbac.authorization.k8s.io
