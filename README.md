@@ -10,8 +10,7 @@ In this tutorial, you will
 ## Before you begin
 This section describes prerequisites you must meet before this tutorial.
 - ConfigSync is installed on your cluster, with the version at least 1.7.0. If not, you can install it following the installation instructions.
-- Configure ConfigSync so that it can sync from multiple repositories. If not, you can configure it following the steps to enable it.
-- You already read the tutorial syncing from multiple repositories and familiar with the concept root repository.
+- Configure ConfigSync so that it can sync from a repository. If not, you can configure it following the steps to enable it.
 - `git` is installed in your local machine.
 - `kustomize` is installed in your local machine. If not, you can install the binary following the installation instructions.
 
@@ -21,26 +20,28 @@ This section describes prerequisites you must meet before this tutorial.
 The example Git repository contains three namespaces for different tenants. The repository contains the  following directories and files.
 ```
 ├── config
-│   ├── base
-│   │   ├── kustomization.yaml
-│   │   ├── namespace.yaml
-│   │   ├── networkpolicy.yaml
-│   │   ├── rolebinding.yaml
-│   │   └── role.yaml
-│   ├── tenant-a
-│   │   └─── kustomization.yaml
-│   ├── tenant-b
-│   │   └─── kustomization.yaml
-│   └── tenant-c
-│       └─── kustomization.yaml
+│   ├── base
+│   │   ├── kustomization.yaml
+│   │   ├── namespace.yaml
+│   │   ├── networkpolicy.yaml
+│   │   ├── rolebinding.yaml
+│   │   └── role.yaml
+│   ├── tenant-a
+│   │   └── kustomization.yaml
+│   ├── tenant-b
+│   │   └── kustomization.yaml
+│   └── tenant-c
+│       └── kustomization.yaml
 ├── deploy
-│   ├── tenant-a
-│   │   └── manifest.yaml
-│   ├── tenant-b
-│   │   └── manifest.yaml
-│   └── tenant-c
-│       └── manifest.yaml
-└── README.md
+│   ├── tenant-a
+│   │   └── manifest.yaml
+│   ├── tenant-b
+│   │   └── manifest.yaml
+│   └── tenant-c
+│       └── manifest.yaml
+├── README.md
+└── scripts
+    └── render.sh
 ```
 
 The directory `config` contains the configuration in kustomize format. They are for one base and  three overlays `tenant-a`, `tenant-b` and `tenant-c`. Each overlay is a customization of the shared `base`. The difference between different overlays is from two parts:
@@ -65,11 +66,10 @@ When you add new configuration or update configuration under the directory `conf
 An overlay is a kustomization that depends on another customization. In this example, there are three overlays: `tenant-a`, `tenant-b` and `tenant-c`. If you only need to update some configuration in one overlay, for example, add another Role to  `tenant-a`. Then you only need to touch the directory `configuration/config/tenant-a`.
 
 
-After the update, you should rebuild the kustomize output for each namespace following the commands.
+After the update, you should rebuild the kustomize output for each namespace by revoking the `render.sh` script.
 ```
-$ kustomize build configuration/config/tenant-a -o configuration/deploy/tenant-a/manifest.yaml
-$ kustomize build configuration/config/tenant-b -o configuration/deploy/tenant-b/manifest.yaml
-$ kustomize build configuration/config/tenant-c -o configuration/deploy/tenant-c/manifest.yaml
+$ cd configuration
+$ ./scripts/render.sh
 ```
 
 Then you can commit and push the update.
