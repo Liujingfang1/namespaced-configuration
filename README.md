@@ -20,7 +20,7 @@ This section describes prerequisites you must meet before this tutorial.
 ### Get the example configuration
 The example Git repository contains three namespaces for different tenants. The repository contains the  following directories and files.
 ```
-├── kustomization
+├── config
 │   ├── base
 │   │   ├── kustomization.yaml
 │   │   ├── namespace.yaml
@@ -36,7 +36,7 @@ The example Git repository contains three namespaces for different tenants. The 
 │   └── tenant-c
 │       ├── kustomization.yaml
 │       └── rolebinding.yaml
-├── namespaces
+├── deploy
 │   ├── tenant-a
 │   │   └── manifest.yaml
 │   ├── tenant-b
@@ -46,11 +46,11 @@ The example Git repository contains three namespaces for different tenants. The 
 └── README.md
 ```
 
-The directory `kustomization` contains the configuration in kustomize format. They are for one base and  three overlays `tenant-a`, `tenant-b` and `tenant-c`. Each overlay is a customization of the shared `base`. The difference between different overlays is from two parts:
-- Namespace. The configuration inside the directory `kustomization/<TENANT>` is all in the namespace `<TENANT>`. This is achieved by adding the namespace directive in `kustomization/<TENANT>/kustomization.yaml`. For example, in `kustomization/tenant-a/kustomization.yaml`:
+The directory `config` contains the configuration in kustomize format. They are for one base and  three overlays `tenant-a`, `tenant-b` and `tenant-c`. Each overlay is a customization of the shared `base`. The difference between different overlays is from two parts:
+- Namespace. The configuration inside the directory `config/<TENANT>` is all in the namespace `<TENANT>`. This is achieved by adding the namespace directive in `config/<TENANT>/kustomization.yaml`. For example, in `config/tenant-a/kustomization.yaml`:
 Namespace: tenant-a
 
-- RoleBinding. For each tenant, the RoleBinding is for a different Group. For example, in `kustomization/tenant-a`, the RoleBinding is for the group `tenant-a-admin@mydomain.com`. This is achieved by applying the patch file `kustomization/tenant-a/rolebinding.yaml`. So the RoleBinding from the `base` is overwritten.
+- RoleBinding. For each tenant, the RoleBinding is for a different Group. For example, in `config/tenant-a`, the RoleBinding is for the group `tenant-a-admin@mydomain.com`. This is achieved by applying the patch file `config/tenant-a/rolebinding.yaml`. So the RoleBinding from the `base` is overwritten.
 
 Fork the example repository into your organization and clone the forked repo locally.
 
@@ -63,16 +63,16 @@ After this, the example configuration is under your local directory `configurati
 ### [optional] Update the namespace specific policies
 If you need to update some configuration, you can follow the instructions in this session. It is optional and shouldn’t affect the steps below.
 #### Update the base
-When you add new configuration or update configuration under the directory `configuration/kustomization/base`, the change will be propagated to configuration for all of `tenant-a`, `tenant-b` and `tenant-c`.
+When you add new configuration or update configuration under the directory `configuration/config/base`, the change will be propagated to configuration for all of `tenant-a`, `tenant-b` and `tenant-c`.
 #### Update an overlay
-An overlay is a kustomization that depends on another customization. In this example, there are three overlays: `tenant-a`, `tenant-b` and `tenant-c`. If you only need to update some configuration in one overlay, for example, add another Role to  `tenant-a`. Then you only need to touch the directory `configuration/kustomization/tenant-a`.
+An overlay is a kustomization that depends on another customization. In this example, there are three overlays: `tenant-a`, `tenant-b` and `tenant-c`. If you only need to update some configuration in one overlay, for example, add another Role to  `tenant-a`. Then you only need to touch the directory `configuration/config/tenant-a`.
 
 
 After the update, you should rebuild the kustomize output for each namespace following the commands.
 ```
-$ kustomize build configuration/kustomization/tenant-a -o configuration/namespaces/tenant-a/manifest.yaml
-$ kustomize build configuration/kustomization/tenant-b -o configuration/namespaces/tenant-b/manifest.yaml
-$ kustomize build configuration/kustomization/tenant-c -o configuration/namespaces/tenant-c/manifest.yaml
+$ kustomize build configuration/config/tenant-a -o configuration/deploy/tenant-a/manifest.yaml
+$ kustomize build configuration/config/tenant-b -o configuration/deploy/tenant-b/manifest.yaml
+$ kustomize build configuration/config/tenant-c -o configuration/deploy/tenant-c/manifest.yaml
 ```
 
 Then you can commit and push the update.
@@ -100,7 +100,7 @@ spec:
   git:
     repo: https://github.com/<YOUR_ORGANIZATION>/namespaced-configuration.git
     branch: main
-    dir: "namespaces"
+    dir: "deploy"
     # We recommend securing your source repository.
     # Other supported auth: `ssh`, `cookiefile`, `token`, `gcenode`.
     auth: none
@@ -126,9 +126,9 @@ $ git clone <ROOT_REPO> root_repo
 Copy the namespace specific policies into the root repository
 
 ```
-$ cp configuration/namespaces/tenant-a/manifest.yaml  root_repo/namespaces/tenanat-a/manifest.yaml
-$ cp configuration/namespaces/tenant-b/manifest.yaml  root_repo/namespaces/tenanat-b/manifest.yaml
-$ cp configuration/namespaces/tenant-c/manifest.yaml  root_repo/namespaces/tenanat-c/manifest.yaml
+$ cp configuration/deploy/tenant-a/manifest.yaml  root_repo/deploy/tenanat-a/manifest.yaml
+$ cp configuration/deploy/tenant-b/manifest.yaml  root_repo/deploy/tenanat-b/manifest.yaml
+$ cp configuration/deploy/tenant-c/manifest.yaml  root_repo/deploy/tenanat-c/manifest.yaml
 ```
 
 Commit and push the changes to the remote root repository.
@@ -157,7 +157,7 @@ $ kubectl get NetworkPolicy/deny-all -n tenant-a
 To clean up the tenant namespaces and policies for them, we recommend removing the directories that contain their configuration from the root repository.
 
 ```
-$ rm -r root_repo/namespaces/tenant-a configuration/namespaces/tenant-b configuration/namespaces/tenant-c
+$ rm -r root_repo/deploy/tenant-a configuration/deploy/tenant-b configuration/deploy/tenant-c
 $ git add .
 $ git commit -m 'clean up'
 $ git push
