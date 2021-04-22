@@ -28,14 +28,11 @@ The example Git repository contains three namespaces for different tenants. The 
 │   │   ├── rolebinding.yaml
 │   │   └── role.yaml
 │   ├── tenant-a
-│   │   ├── kustomization.yaml
-│   │   └── rolebinding.yaml
+│   │   └─── kustomization.yaml
 │   ├── tenant-b
-│   │   ├── kustomization.yaml
-│   │   └── rolebinding.yaml
+│   │   └─── kustomization.yaml
 │   └── tenant-c
-│       ├── kustomization.yaml
-│       └── rolebinding.yaml
+│       └─── kustomization.yaml
 ├── deploy
 │   ├── tenant-a
 │   │   └── manifest.yaml
@@ -140,7 +137,14 @@ $ git push origin main
 ```
 
 ## Verify namespace specific policies are synced
-Now you can verify that the namespace specific policies are synced to the cluster. This can be done by commands similar to the following
+Now you can verify that the namespace specific policies are synced to the cluster.
+
+```
+nomos status
+```
+
+You can also double-check the resources exist in the cluster.
+
 ```
 # Verify the RoleBinding exist
 $ kubectl get RoleBinding/tenant-admin-rolebinding -n tenant-a
