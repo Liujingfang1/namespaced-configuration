@@ -88,12 +88,12 @@ Following the console instructions for
 [configuring Config Sync](https://cloud.google.com/anthos-config-management/docs/how-to/installing-config-sync),
 you need to
 
-- Select *None* in the *Git Repository Authentication for ACM* section
-- Select *Enable Config Sync* in the *ACM settings for your clusters* section
-   - the *URL* should be the Git repository url for your fork: `https://github.com/<YOUR_ORGANIZATION>/namespaced-configuration.git`.
-   - the *Branch" should be `main`.
-   - the *Tag/Commit* should be `HEAD`.
-   - the `Source format` field should *unstructured*.
+- Select **None** in the **Git Repository Authentication for ACM** section
+- Select **Enable Config Sync** in the **ACM settings for your clusters** section
+   - the **URL** should be the Git repository url for your fork: `https://github.com/<YOUR_ORGANIZATION>/namespaced-configuration.git`.
+   - the **Branch** should be `main`.
+   - the **Tag/Commit** should be `HEAD`.
+   - the **Source format** field should **unstructured**.
 
 
 ## Verify namespace specific policies are synced
